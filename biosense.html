@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BioSense: warning networks that think like slime mold</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tinos:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#02040a;--navy:#071226;--navy2:#0c1f45;--line:#17305e;--ice:#8cbcff;--cyan:#5eead4;--violet:#9b8cff;--text:#e8effc;--mute:#92a6c8;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-behavior:smooth;scroll-padding-top:70px}
+body{margin:0;background:var(--bg);color:var(--text);font:400 18px/1.65 Tinos,'Times New Roman',Times,serif}
+h1,h2,h3{font-weight:400;font-family:Tinos,'Times New Roman',Times,serif;margin:0;line-height:1.08;letter-spacing:-.02em}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;display:flex;justify-content:space-between;align-items:center;padding:14px 5vw;background:rgba(2,4,10,.78);backdrop-filter:blur(10px);border-bottom:1px solid #0e1c36}
+nav b{font:700 20px Tinos,'Times New Roman',Times,serif;letter-spacing:-.03em}
+nav b i{font-style:normal;background:linear-gradient(90deg,var(--ice),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
+nav div a{margin-left:26px;text-decoration:none;color:var(--mute);font-size:15px}
+nav div a:hover{color:var(--text)}
+.hero{position:relative;min-height:92vh;display:grid;align-items:end;padding:0 5vw 7vh;overflow:hidden;background:radial-gradient(110% 90% at 72% 8%,rgba(12,31,69,.75),transparent 70%)}
+#net{position:absolute;inset:0;width:100%;height:100%}
+.hero .in{position:relative;max-width:860px;pointer-events:none}
+.hero .in>*{pointer-events:auto}
+.hero h1{font-size:clamp(42px,7vw,88px);font-weight:400}
+.hero p{max-width:560px;color:var(--mute);font-size:21px;margin:22px 0 28px}
+.btns{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.btn{font:600 15px Tinos,'Times New Roman',Times,serif;padding:13px 22px;border-radius:999px;border:1px solid var(--cyan);background:var(--cyan);color:#021014;text-decoration:none;cursor:pointer}
+.btn.g{background:transparent;color:var(--text);border-color:var(--line)}
+.btn.g:hover{border-color:var(--ice)}
+.status{position:absolute;right:5vw;top:24px;text-align:right;font-size:14px;color:var(--mute);max-width:280px}
+.status strong{display:block;color:var(--cyan);font:500 15px Tinos,'Times New Roman',Times,serif;margin-bottom:4px}
+select{background:var(--navy);color:var(--text);border:1px solid var(--line);border-radius:999px;padding:12px 16px;font:500 15px Tinos,'Times New Roman',Times,serif}
+section{padding:12vh 5vw;max-width:1180px;margin:0 auto}
+.band{max-width:none;background:linear-gradient(180deg,rgba(7,18,38,.7),transparent)}
+.band>div{max-width:1180px;margin:0 auto}
+h2{font-size:clamp(30px,4.6vw,56px);max-width:17ch;margin-bottom:24px}
+.lead{max-width:62ch;color:var(--mute);font-size:21px}
+.quote{margin:34px 0 0;padding-left:20px;border-left:2px solid var(--cyan);font:italic 400 clamp(22px,2.6vw,30px)/1.35 Tinos,'Times New Roman',Times,serif;color:var(--text);max-width:34ch}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:6vw;align-items:center}
+.cmp{display:grid;gap:14px}
+.box{border:1px solid var(--line);border-radius:14px;padding:22px;background:rgba(12,31,69,.35)}
+.box h3{font-size:19px;margin-bottom:8px}
+.box p{margin:0;color:var(--mute);font-size:16px}
+.map{margin-top:44px;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--navy)}
+.row{display:grid;grid-template-columns:1fr 36px 1fr;gap:10px;align-items:center;padding:16px 24px;border-top:1px solid #10264d}
+.row:first-child{border-top:0}
+.row.h{font:500 14px Tinos,'Times New Roman',Times,serif;color:var(--mute);background:#0a1a38}
+.row span:nth-child(2){color:var(--cyan);text-align:center}
+.row b{font-weight:600}
+.row em{font-style:normal;color:var(--ice)}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);margin-top:48px;border-top:1px solid var(--line)}
+.steps div{padding:26px 24px 0 0;position:relative}
+.steps div::before{content:"";position:absolute;top:-6px;left:0;width:11px;height:11px;border-radius:50%;background:var(--cyan);box-shadow:0 0 14px var(--cyan)}
+.steps h3{font-size:20px;margin:8px 0}
+.steps p{margin:0;color:var(--mute);font-size:15.5px}
+.steps small{color:var(--cyan);font:500 14px Tinos,'Times New Roman',Times,serif}
+.gap{margin-top:46px;border:1px solid var(--line);border-radius:14px;padding:26px;background:var(--navy)}
+.lane{display:flex;align-items:center;gap:14px;margin:12px 0;font-size:15px;color:var(--mute)}
+.lane span{width:130px;flex:none}
+.bar{flex:1;height:12px;border-radius:6px;position:relative;overflow:hidden;background:#12305f}
+.bar::after{content:"";position:absolute;inset:0;transform:translateX(-100%);animation:run 3.6s linear forwards paused}
+.gap.go .bar::after{animation-play-state:running}.p::after{background:linear-gradient(90deg,var(--ice),var(--cyan));animation-duration:2.6s}
+.s::after{background:linear-gradient(90deg,#5b6bd8,var(--violet));animation-duration:4.4s}
+@keyframes run{to{transform:translateX(0)}}
+.gap p{margin:18px 0 0;font-size:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin-top:40px}
+.grid3 .box{background:transparent}
+.est{margin-top:34px;display:flex;flex-wrap:wrap;gap:10px 28px;align-items:baseline;padding:14px 18px;border:1px dashed var(--line);border-radius:12px;font-size:14px;color:var(--mute);max-width:820px}
+.est b{font:600 17px Tinos,'Times New Roman',Times,serif;color:var(--ice);margin-right:6px}
+.est small{flex-basis:100%;font-size:12.5px;opacity:.8}
+.cta{text-align:center}
+.cta h2{margin:0 auto 24px;max-width:18ch}
+.cta .lead{margin:0 auto 32px}
+footer{padding:30px 5vw;border-top:1px solid #0e1c36;color:var(--mute);font-size:14px;text-align:center}
+@media(max-width:820px){.two{grid-template-columns:1fr}.steps{grid-template-columns:1fr 1fr;row-gap:30px}nav div a:not(:last-child){display:none}.status{position:relative;inset:auto;text-align:left;margin-top:80px}.hero{align-content:space-between}.lane span{width:96px}.row{padding:14px 16px;font-size:15px}}
+@media(prefers-reduced-motion:reduce){.bar::after{animation:none;transform:none}html{scroll-behavior:auto}}
+
+.fluid{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+.fluid i{position:absolute;border-radius:50%;filter:blur(90px);will-change:transform}
+.fluid i:nth-child(1){width:55vmax;height:55vmax;left:-15vmax;top:-10vmax;background:#0d2a66;opacity:.6;animation:f1 28s ease-in-out infinite alternate}
+.fluid i:nth-child(2){width:45vmax;height:45vmax;right:-12vmax;top:30vh;background:#0e6a70;opacity:.28;animation:f2 34s ease-in-out infinite alternate}
+.fluid i:nth-child(3){width:50vmax;height:50vmax;left:20vw;bottom:-25vmax;background:#35309a;opacity:.4;animation:f3 40s ease-in-out infinite alternate}
+@keyframes f1{to{transform:translate(22vw,26vh) scale(1.25) rotate(50deg)}}
+@keyframes f2{to{transform:translate(-26vw,-18vh) scale(.8) rotate(-40deg)}}
+@keyframes f3{to{transform:translate(-18vw,-30vh) scale(1.2) rotate(30deg)}}
+.glow{position:fixed;z-index:-1;left:0;top:0;width:560px;height:560px;margin:-280px 0 0 -280px;border-radius:50%;background:radial-gradient(circle,rgba(94,234,212,.13),transparent 65%);pointer-events:none}
+.wv{height:70px;overflow:hidden;margin-bottom:-1px}
+.wv svg{display:block;width:200%;height:70px;animation:wave 22s linear infinite}
+.wv path{fill:rgba(7,18,38,.7)}
+@keyframes wave{to{transform:translateX(-50%)}}
+.hero h1{background:linear-gradient(100deg,#e8effc 15%,#8cbcff 40%,#5eead4 58%,#9b8cff 78%,#e8effc);background-size:260% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:flow 16s ease-in-out infinite alternate}
+@keyframes flow{to{background-position:100% 0}}
+.box{position:relative;overflow:hidden;transition:transform .5s cubic-bezier(.2,.7,.2,1),border-color .4s}
+.box::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .4s;background:radial-gradient(260px circle at var(--mx,50%) var(--my,50%),rgba(94,234,212,.13),transparent 60%)}
+.btn{transition:transform .4s cubic-bezier(.2,.7,.2,1),box-shadow .4s,border-color .3s}
+.rv{opacity:0;transform:translateY(30px);filter:blur(8px);transition:opacity 1s cubic-bezier(.2,.7,.2,1),transform 1.1s cubic-bezier(.2,.7,.2,1),filter 1s}
+.rv.in{opacity:1;transform:none;filter:none}
+.box:hover{transform:translateY(-4px);border-color:#2b5aa8}
+.box:hover::after{opacity:1}
+.btn:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(94,234,212,.32)}
+@media(prefers-reduced-motion:reduce){.fluid i,.wv svg,.hero h1{animation:none}.glow{display:none}}
+
+.gh{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.gh b{font-weight:400;font-size:22px}
+.gh .btn{padding:7px 16px;font-size:14px}
+.ln{position:relative;height:44px;margin:6px 10px 0}
+.ln::before{content:"";position:absolute;left:0;right:0;bottom:8px;height:2px;background:#16305e}
+.ln em{position:absolute;left:0;top:0;font-style:normal;font-size:15px;color:var(--mute)}
+.dot{position:absolute;bottom:0;left:0;width:16px;height:16px;margin-left:-8px;border-radius:50%}
+.dp{background:var(--cyan);box-shadow:0 0 16px var(--cyan)}
+.ds{background:var(--violet);box-shadow:0 0 16px var(--violet)}
+.ends{display:flex;justify-content:space-between;font-size:13px;color:var(--mute);margin:4px 2px 18px}
+.wbar{height:12px;border-radius:6px;background:#12305f;overflow:hidden}
+.wbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--violet))}
+.rd{display:flex;justify-content:space-between;gap:16px;margin-top:12px;font-size:16px}
+.rd span:first-child{color:var(--ice);white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="fluid" aria-hidden="true"><i></i><i></i><i></i></div><div class="glow" aria-hidden="true"></div>
+<nav><b>Bio<i>Sense</i></b><div><a href="#nature">Slime mold</a><a href="#algo">The algorithm</a><a href="#how">How it works</a><a href="#beyond">Disasters</a><a href="#turkey">Turkey</a></div></nav>
+
+<header class="hero">
+<canvas id="net" aria-label="Simulation of an alert spreading through a slime mold style network after towers fail"></canvas>
+<div class="status" aria-live="polite"><strong id="st1">Network standing by</strong><span id="st2">Towers up. Everyone connected.</span></div>
+<div class="in">
+<h1>Early warning with the intelligence of slime mold.</h1>
+<p>A slime mold has no brain, yet it builds networks that engineers struggle to match. BioSense borrows that strategy from nature and turns it into seismic sensing and alert delivery that keeps improving, even when parts of the system are damaged.</p>
+<div class="btns"><button class="btn" id="go">Trigger the event</button><select id="kind" aria-label="Disaster type"><option>Earthquake</option><option>Flood</option><option>Wildfire</option><option>Tsunami</option></select><a class="btn g" href="#nature">Meet the slime mold</a></div>
+</div>
+</header>
+
+<section id="nature">
+<div class="two">
+<div><h2>Nobody knows nature better than nature itself.</h2>
+<p class="lead">This is biomimicry: instead of inventing a solution from scratch, we study one that evolution has already tested. <i>Physarum polycephalum</i>, a slime mold, is a single giant cell with thousands of nuclei and not one neuron. It still finds the shortest path through a maze, and in a 2010 study in <i>Science</i> it grew a network with efficiency and fault tolerance comparable to the Tokyo rail system. Its method is a feedback loop: the more protoplasm flows through a tube, the wider that tube grows, while neglected tubes wither away.</p><p class="quote">We did not design the algorithm. We learned it from the slime mold.</p></div>
+<div class="cmp">
+<div class="box"><h3>Explore</h3><p>A fan of fine tubes spreads in every direction, sampling many routes in parallel with no central planner.</p></div>
+<div class="box"><h3>Reinforce</h3><p>Flow widens the tubes that carry it, a positive feedback loop. Tubes with little flow shrink and disappear.</p></div>
+<div class="box"><h3>Adapt</h3><p>Sever a tube and the flow redistributes, so the network regrows a path around the wound.</p></div>
+</div></div>
+</section>
+
+<div class="wv" aria-hidden="true"><svg viewBox="0 0 2880 100" preserveAspectRatio="none"><path d="M0 40 C120 0 240 0 360 40 S600 80 720 40 C840 0 960 0 1080 40 S1320 80 1440 40 C1560 0 1680 0 1800 40 S2040 80 2160 40 C2280 0 2400 0 2520 40 S2760 80 2880 40 L2880 100 L0 100Z"/></svg></div>
+<section class="band" id="algo"><div>
+<h2>From slime mold to algorithm.</h2>
+<p class="lead">BioSense maps each behavior of Physarum onto a part of the warning system, so the sensor network optimizes itself the way slime mold does.</p>
+<div class="map">
+<div class="row h"><span>In the slime mold</span><span></span><span>In BioSense</span></div>
+<div class="row"><b>Food sources</b><span>→</span><span>Seismic sensors, <em>placed and tuned by the algorithm</em></span></div>
+<div class="row"><b>Exploring in every direction</b><span>→</span><span>Sensor configuration and sensitivity adapt <em>continuously</em></span></div>
+<div class="row"><b>Reinforcing busy tubes</b><span>→</span><span>Communication paths <em>self-optimize</em> for the fastest transmission</span></div>
+<div class="row"><b>Reshaping after damage</b><span>→</span><span>Data keeps flowing <em>even if parts of the system fail</em></span></div>
+<div class="row"><b>Responding to its environment</b><span>→</span><span>Learns from each seismic event for <em>local geology</em></span></div>
+</div></div></section>
+
+<section id="how">
+<h2>Four steps, a few seconds.</h2>
+<p class="lead">Every extra second of warning lets people drop, cover and move away from danger.</p>
+<div class="steps">
+<div><small>Step 1</small><h3>Detect</h3><p>Slime mold optimized sensors catch the fastest signal first. For earthquakes, that is the P-wave.</p></div>
+<div><small>Step 2</small><h3>Recognize</h3><p>Biomimetic pattern recognition separates genuine events from background noise.</p></div>
+<div><small>Step 3</small><h3>Route</h3><p>Data flows along self-optimizing pathways, and if links break, it finds a new way.</p></div>
+<div><small>Step 4</small><h3>Relay</h3><p>The first person to receive the alert becomes the distributor and passes it on, so there is no single point of failure.</p></div>
+</div>
+<div class="gap" id="gap">
+<div class="gh"><b>The earthquake time gap</b><button class="btn g" id="replay" type="button">Replay</button></div>
+<div class="ln"><em>P-wave, about 6 km/s</em><i class="dot dp" id="dp"></i></div>
+<div class="ln"><em>S-wave, about 4 km/s</em><i class="dot ds" id="ds"></i></div>
+<div class="ends"><span>Epicenter</span><span>City, 150 km away</span></div>
+<div class="wbar"><i id="wf"></i></div>
+<div class="rd"><span id="clk">t = 0.0 s</span><span id="msg">Waves leave the epicenter.</span></div>
+<p>P-waves arrive first and are the early signal. The slower S-waves cause the destruction. The gap runs from seconds to tens of seconds depending on distance, and BioSense uses it as warning time.</p>
+</div>
+</section>
+
+<div class="wv" aria-hidden="true"><svg viewBox="0 0 2880 100" preserveAspectRatio="none"><path d="M0 40 C120 0 240 0 360 40 S600 80 720 40 C840 0 960 0 1080 40 S1320 80 1440 40 C1560 0 1680 0 1800 40 S2040 80 2160 40 C2280 0 2400 0 2520 40 S2760 80 2880 40 L2880 100 L0 100Z"/></svg></div>
+<section class="band" id="beyond"><div>
+<h2>Built for earthquakes. Made for every disaster.</h2>
+<p class="lead">Wherever a hazard can be sensed early, a self-organizing network can carry the warning. Only the sensors and event patterns change.</p>
+<div class="grid3">
+<div class="box"><h3>Earthquakes</h3><p>P-wave detection and alert delivery. Our first application.</p></div>
+<div class="box"><h3>Floods</h3><p>River and rainfall sensors passing warnings downstream before roads close.</p></div>
+<div class="box"><h3>Wildfires</h3><p>Early smoke and heat detection in areas with no coverage.</p></div>
+<div class="box"><h3>Tsunamis</h3><p>Coastal alerts that keep moving when power and towers go out.</p></div>
+<div class="box"><h3>Landslides and storms</h3><p>The same network design with new signatures plugged in.</p></div>
+</div></div></section>
+
+<section id="turkey">
+<h2>Applied to Turkey’s datasets.</h2>
+<p class="lead">BioSense has been applied to Turkey’s seismic datasets and tuned to Istanbul’s specific geological conditions. Like Physarum, it reconfigures itself after every event to be more effective for the next one.</p>
+<div class="est">
+<span><b>≈8–17 s</b>extra warning at 100–200 km</span>
+<span><b>&gt;90%</b>alert reach with half the network down</span>
+<span><b>↑</b>faster detection after each event</span>
+<small>Modelled estimates from the P and S wave speeds above, pending validation on the full datasets.</small>
+</div>
+</section>
+
+<section class="cta">
+<h2>Help us turn seconds into lives.</h2>
+<p class="lead">BioSense is looking for partners, advisors and early backers who want resilient early warning to become the standard.</p>
+<p style="margin:-12px 0 28px;font:500 17px Tinos,'Times New Roman',Times,serif">Duru Ozmal, Founder</p><a class="btn" href="mailto:duruozmal@berkeley.edu">duruozmal@berkeley.edu</a>
+</section>
+<footer>© 2026 BioSense · Founded by Duru Ozmal · biosenseproject.com</footer>
+
+<script>
+(function(){
+var mx=-999,my=-999,cv=document.getElementById("net"),cx=cv.getContext("2d"),W,H,N=[],E=[],T=[],clock=0,active=false,epi=null,done=false,fade=0,timer;
+var rm=matchMedia("(prefers-reduced-motion: reduce)").matches;
+var s1=document.getElementById("st1"),s2=document.getElementById("st2"),kind=document.getElementById("kind");
+var verbs={Earthquake:"P-wave detected",Flood:"Water surge detected",Wildfire:"Fire front detected",Tsunami:"Sea level anomaly detected"};
+function build(){var r=cv.getBoundingClientRect(),d=devicePixelRatio||1;W=r.width;H=r.height;cv.width=W*d;cv.height=H*d;cx.setTransform(d,0,0,d,0,0);
+ var n=Math.round(Math.min(95,W*H/9000)),s=7;N=[];
+ for(var i=0;i<n;i++){s=s*16807%2147483647;var a=s/2147483647;s=s*16807%2147483647;var b=s/2147483647;N.push({x:W*(.03+.94*a),y:H*(.1+.8*b),d:1e9,p:-1,first:false})}
+ E=[];var R=Math.max(110,Math.sqrt(W*H/n)*1.9);
+ for(i=0;i<n;i++)for(var j=i+1;j<n;j++){var l=Math.hypot(N[i].x-N[j].x,N[i].y-N[j].y);if(l<R)E.push([i,j,l])}
+ T=[[.2,.25],[.5,.18],[.8,.3],[.62,.6]].map(function(t){return{x:W*t[0],y:H*t[1],on:true}});reset()}
+function reset(){N.forEach(function(n){n.d=1e9;n.p=-1;n.first=false});T.forEach(function(t){t.on=true});active=false;done=false;epi=null;clock=0;fade=0;
+ s1.textContent="Network standing by";s2.textContent="Towers up. Everyone connected."}
+function trigger(){clearTimeout(timer);reset();
+ epi={x:W*(.25+Math.random()*.5),y:H*(.25+Math.random()*.4)};
+ var src=0,best=1e9;N.forEach(function(n,i){var q=Math.hypot(n.x-epi.x,n.y-epi.y);if(q<best){best=q;src=i}});
+ T.forEach(function(t){t.on=false});
+ var adj=N.map(function(){return[]});E.forEach(function(e){adj[e[0]].push([e[1],e[2]]);adj[e[1]].push([e[0],e[2]])});
+ var Q=[src];N[src].d=0;
+ while(Q.length){Q.sort(function(a,b){return N[b].d-N[a].d});var u=Q.pop();adj[u].forEach(function(v){var nd=N[u].d+v[1];if(nd<N[v[0]].d){N[v[0]].d=nd;N[v[0]].p=u;Q.push(v[0])}})}
+ N[src].first=true;active=true;clock=rm?1e9:-60;
+ s1.textContent=verbs[kind.value]+" · towers down";s2.textContent="Cellular network lost. The first phone becomes the distributor and the alert spreads like a growing slime mold."}
+function frame(){cx.clearRect(0,0,W,H);
+ var tm=performance.now()*.001;N.forEach(function(n,i){if(n.bx===undefined){n.bx=n.x;n.by=n.y}var dx=n.bx-mx,dy=n.by-my,q=Math.hypot(dx,dy)||1,f=q<160?(160-q)/160*24:0;n.x=n.bx+Math.sin(tm*.6+i)*4+dx/q*f;n.y=n.by+Math.cos(tm*.5+i*1.3)*4+dy/q*f});
+ var ba=active&&done?Math.max(.05,.16-fade*.0008):.16;if(done)fade++;
+ E.forEach(function(e){var a=N[e[0]],b=N[e[1]];cx.strokeStyle="rgba(70,120,210,"+ba+")";cx.lineWidth=1;cx.beginPath();cx.moveTo(a.x,a.y);cx.lineTo(b.x,b.y);cx.stroke()});
+ if(active){clock+=1.5;var reached=0,tot=0;
+  N.forEach(function(n){if(n.d<1e8)tot++;if(n.p>=0&&clock>=n.d){reached++;var p=N[n.p],k=Math.min(1,(clock-n.d)/60+.35);cx.strokeStyle="rgba(94,234,212,"+(.35+.5*k)+")";cx.lineWidth=1+2.2*k;cx.shadowColor="#5eead4";cx.shadowBlur=10;cx.beginPath();cx.moveTo(p.x,p.y);cx.lineTo(n.x,n.y);cx.stroke();cx.shadowBlur=0}});
+  if(epi){var t=Math.max(0,clock+40);for(var r=0;r<3;r++){var rr=(t*1.4+r*70)%260;cx.strokeStyle="rgba(155,140,255,"+(Math.max(0,1-rr/260)*.5)+")";cx.lineWidth=1.5;cx.beginPath();cx.arc(epi.x,epi.y,rr,0,7);cx.stroke()}}
+  if(!done&&clock>0&&reached>=tot-1){done=true;s1.textContent="Alert delivered to "+reached+" people";s2.textContent="Fastest routes reinforced, unused ones fade, as in Physarum. No towers used.";if(!rm)timer=setTimeout(trigger,9000)}}
+ N.forEach(function(n){var on=!active||n.d>1e8||clock>=n.d||n.first;cx.fillStyle=on&&active?(n.first?"#fff":"#5eead4"):"#8cbcff";cx.globalAlpha=on?1:.4;cx.beginPath();cx.arc(n.x,n.y,n.first?5:2.4,0,7);cx.fill();cx.globalAlpha=1});
+ T.forEach(function(t){cx.strokeStyle=t.on?"#8cbcff":"#9b8cff";cx.lineWidth=2;cx.strokeRect(t.x-7,t.y-7,14,14);if(!t.on){cx.beginPath();cx.moveTo(t.x-9,t.y-9);cx.lineTo(t.x+9,t.y+9);cx.stroke()}});
+ if(!rm||active)requestAnimationFrame(frame)}
+document.getElementById("go").onclick=function(){trigger();if(rm)frame()};
+kind.onchange=function(){trigger();if(rm)frame()};
+var rz;addEventListener("resize",function(){clearTimeout(rz);rz=setTimeout(function(){build();frame()},150)});
+build();frame();if(!rm)timer=setTimeout(trigger,1500);
+
+cv.addEventListener("pointermove",function(e){var r=cv.getBoundingClientRect();mx=e.clientX-r.left;my=e.clientY-r.top});
+cv.addEventListener("pointerleave",function(){mx=my=-999});
+var gx=innerWidth/2,gy=innerHeight*.4,tx=gx,ty=gy,gl=document.querySelector(".glow");
+addEventListener("pointermove",function(e){tx=e.clientX;ty=e.clientY;var b=e.target.closest&&e.target.closest(".box");if(b){var r=b.getBoundingClientRect();b.style.setProperty("--mx",e.clientX-r.left+"px");b.style.setProperty("--my",e.clientY-r.top+"px")}});
+if(!rm)(function L(){gx+=(tx-gx)*.06;gy+=(ty-gy)*.06;gl.style.transform="translate("+gx+"px,"+gy+"px)";requestAnimationFrame(L)})();
+if(!rm&&"IntersectionObserver" in window){var rv=new IntersectionObserver(function(en){en.forEach(function(x){if(x.isIntersecting){x.target.classList.add("in");rv.unobserve(x.target)}})},{threshold:.12});
+document.querySelectorAll("h2,.lead,.quote,.box,.row,.steps>div,.gap,.est,.cta .btn").forEach(function(el){el.classList.add("rv");el.style.transitionDelay=Math.min([].indexOf.call(el.parentNode.children,el)*70,420)+"ms";rv.observe(el)})}
+})();
+</script>
+<script>
+(function(){
+var rm=matchMedia("(prefers-reduced-motion: reduce)").matches,g=document.getElementById("gap"),dp=document.getElementById("dp"),ds=document.getElementById("ds"),wf=document.getElementById("wf"),clk=document.getElementById("clk"),msg=document.getElementById("msg");
+var tp=150/6,ts=150/4,T=ts+3,raf;
+function set(t){dp.style.left=Math.min(1,t/tp)*100+"%";ds.style.left=Math.min(1,t/ts)*100+"%";clk.textContent="t = "+t.toFixed(1)+" s";
+ var w=Math.max(0,Math.min(t,ts)-tp);wf.style.width=w/(ts-tp)*100+"%";
+ msg.textContent=t<tp?"Waves leave the epicenter.":t<ts?"P-wave has arrived. The destructive S-wave is still "+(ts-tp-w).toFixed(1)+" s away.":"S-wave arrives. The gap is your warning time: about "+(ts-tp).toFixed(0)+" s."}
+function play(){cancelAnimationFrame(raf);if(rm){set(T);return}var t0=performance.now();(function f(n){var t=Math.min(T,(n-t0)/9000*T);set(t);if(t<T)raf=requestAnimationFrame(f)})(t0)}
+set(0);document.getElementById("replay").onclick=play;
+if("IntersectionObserver" in window){var io=new IntersectionObserver(function(e){if(e[0].isIntersecting){io.disconnect();play()}},{threshold:.4});io.observe(g)}else play();
+})();
+</script>
+</body>
+</html>
